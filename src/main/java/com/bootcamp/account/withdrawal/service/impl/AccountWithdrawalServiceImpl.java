@@ -2,6 +2,7 @@ package com.bootcamp.account.withdrawal.service.impl;
 
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -25,17 +26,26 @@ import reactor.core.publisher.Mono;
 public class AccountWithdrawalServiceImpl implements AccountWithdrawalService{
 	private final AccountWithdrawalRepository accountWithdrawalRepository;
     
-	private WebClient creditServiceClient = WebClient.builder()
-		      .baseUrl("http://localhost:8092")
-		      .build();
+	@Autowired
+    private  WebClient.Builder builder;
+	
+//	private WebClient creditServiceClient = WebClient.builder()
+//		      .baseUrl("http://localhost:8092")
+//		      .build();
    
-	private Function<AccountByNumAccountRequest, Mono<AccountByNumAccountResponse>> msAccountbynumAccount = (objeto) -> creditServiceClient.post()
+	private Function<AccountByNumAccountRequest, Mono<AccountByNumAccountResponse>> msAccountbynumAccount = (objeto) -> builder
+			.baseUrl("http://ms-account")
+		    .build()
+			.post()
 			.uri("/Account/numAccount/")
 			.body(Mono.just(objeto), AccountByNumAccountResponse.class)
 			.retrieve()
 			.bodyToMono(AccountByNumAccountResponse.class);
 	
-	private Function<AccountUpdateForTrxRequest, Mono<AccountUpdateForTrxResponse>> msAccountTrx = (objeto) -> creditServiceClient.put()
+	private Function<AccountUpdateForTrxRequest, Mono<AccountUpdateForTrxResponse>> msAccountTrx = (objeto) -> builder
+			.baseUrl("http://ms-account")
+		    .build()
+			.put()
 			.uri("/Account/updateAccountTrx/")
 			.body(Mono.just(objeto), AccountUpdateForTrxResponse.class)
 			.retrieve()
